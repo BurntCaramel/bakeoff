@@ -1,0 +1,25 @@
+{
+  "name": "bakeoff-api",
+  "version": "0.1.0",
+  "description": "Bundler API",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "css-loader": "^0.28.7",
+    "hapi": "^17.1.1",
+    "memory-fs": "^0.4.1",
+    "unionfs": "^3.0.1",
+    "webpack": "^3.9.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.12.1"
+  },
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  }
+}
