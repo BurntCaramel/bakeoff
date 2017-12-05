@@ -24,10 +24,10 @@ import './index.css';
 
 console.log('HELLO! TWO!')
 
-// ReactDOM.render(
-//   <App />,
-//   document.getElementById('root')
-// );
+ReactDOM.render(
+  <App />,
+  document.getElementById('root')
+);
 `
 ))
 
@@ -130,6 +130,10 @@ const compiler = webpack({
         }
       }
     ]
+  },
+  externals: {
+    'react': 'React',
+    'react-dom': 'ReactDOM'
   }
 })
 
@@ -139,8 +143,15 @@ compiler.inputFileSystem = mergedInputFS
 // compiler.resolvers.context.fileSystem = mergedInputFS
 // compiler.resolvers.loader.fileSystem = mergedInputFS
 
-function run() {
+function run({
+  componentJS
+} = {}) {
   return new Promise((resolve, reject) => {
+
+    if (componentJS) {
+      inputFS.writeFileSync('/app/src/App.js', componentJS)
+    }
+
     compiler.run((error, stats) => {
       console.log('run error', error, stats && stats.compilation.errors)
       if (error) {

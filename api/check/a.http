@@ -1,1 +1,9 @@
-http://localhost:8787/build
+GET http://localhost:8787/build
+
+###
+POST http://localhost:8787/build
+Content-Type: application/javascript
+
+< ./App1.js
+
+###
