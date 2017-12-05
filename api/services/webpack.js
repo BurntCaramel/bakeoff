@@ -20,9 +20,9 @@ inputFS.writeFileSync('/app/src/entry.js', (
 // import React from 'react';
 // import ReactDOM from 'react-dom';
 import App from './App';
-// import './index.css';
+import './index.css';
 
-console.log('HELLO!')
+console.log('HELLO! TWO!')
 
 // ReactDOM.render(
 //   <App />,
@@ -36,7 +36,7 @@ inputFS.writeFileSync('/app/src/App.js', (
 
 function App(props) {
   return (
-    <div>APP!</div>
+    <div>DYNAMIC! APP!</div>
   )
 }
 
@@ -48,6 +48,7 @@ inputFS.writeFileSync('/app/src/index.css', (
 `
 html {
   font-size: 20px;
+  line-height: 2;
 }
 `
 ))
@@ -58,32 +59,6 @@ unionInputFS.use(inputFS, FS)
 console.log(Path.resolve(__dirname, '..', 'node_modules'))
 
 const mergedInputFS = createMergedFileSystem({
-  // '/node_modules': Path.resolve(__dirname, '..', 'node_modules'),
-  // '/package.json': {
-  //   alias: '/app/package.json',
-  //   filesystem: inputFS
-  // },
-  // '/app/package.json': {
-  //   alias: '/app/package.json',
-  //   filesystem: inputFS
-  // },
-  // '/app/src/entry.js': {
-  //   alias: '/app/src/entry.js',
-  //   filesystem: inputFS
-  // },
-  '/app/src/entry.js/package.json': {
-    alias: '/app/package.json',
-    filesystem: inputFS
-  },
-  // '/app/src/entry.js/package.json': {
-  //   alias: '/app/package.json',
-  //   filesystem: inputFS
-  // },
-  // '/app': {
-  //   alias: '/app',
-  //   filesystem: inputFS
-  // },
-  // '/': Path.resolve(__dirname, '..'),
   [Path.resolve(__dirname, '..', 'app')]: {
     alias: '/app',
     filesystem: inputFS
@@ -159,7 +134,7 @@ const compiler = webpack({
 })
 
 compiler.outputFileSystem = outputFS
-// compiler.inputFileSystem = mergedInputFS
+compiler.inputFileSystem = mergedInputFS
 // compiler.resolvers.normal.fileSystem = mergedInputFS
 // compiler.resolvers.context.fileSystem = mergedInputFS
 // compiler.resolvers.loader.fileSystem = mergedInputFS
