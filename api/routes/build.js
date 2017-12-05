@@ -61,11 +61,11 @@ module.exports = [
   },
   {
     method: 'GET',
-    path: '/build/github/{orgName}/{repoName}/{filePath*}',
+    path: '/build/github/{orgName}/{repoName}/{branch}/{filePath*}',
     async handler(request, h) {
-      const { orgName, repoName, filePath } = request.params
+      const { orgName, repoName, branch, filePath } = request.params
 
-      const { data: componentJS } = await axios.get(`https://cdn.rawgit.com/${orgName}/${repoName}/master/${filePath}`)
+      const { data: componentJS } = await axios.get(`https://cdn.rawgit.com/${orgName}/${repoName}/${branch}/${filePath}`)
 
       const props = _.mapValues(request.query, (value) => {
         if (value.length === 0) {
