@@ -12,6 +12,9 @@
     "css-loader": "^0.28.7",
     "hapi": "^17.1.1",
     "memory-fs": "^0.4.1",
+    "merged-fs": "^0.2.1",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
     "unionfs": "^3.0.1",
     "webpack": "^3.9.1"
   },

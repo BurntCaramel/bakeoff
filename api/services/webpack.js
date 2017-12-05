@@ -2,22 +2,24 @@ const Path = require('path')
 const webpack = require('webpack')
 const MemoryFS = require('memory-fs')
 const { Union } = require('unionfs')
+const createMergedFileSystem = require('merged-fs')
 const FS = require('fs')
 
 const inputFS = new MemoryFS()
-inputFS.writeFileSync('/package.json', JSON.stringify({
+inputFS.mkdirSync('/app')
+inputFS.writeFileSync('/app/package.json', JSON.stringify({
   "name": "backoff-target",
   "version": "1.0.0",
   "description": "",
   "main": "src/entry.js"
 }))
 
-inputFS.mkdirSync('/src')
-inputFS.writeFileSync('/src/entry.js', (
+inputFS.mkdirSync('/app/src')
+inputFS.writeFileSync('/app/src/entry.js', (
 `
 // import React from 'react';
 // import ReactDOM from 'react-dom';
-// import App from './App';
+import App from './App';
 // import './index.css';
 
 console.log('HELLO!')
@@ -29,7 +31,7 @@ console.log('HELLO!')
 `
 ))
 
-inputFS.writeFileSync('/src/App.js', (
+inputFS.writeFileSync('/app/src/App.js', (
 `import React from 'react';
 
 function App(props) {
@@ -42,7 +44,7 @@ export default App;
 `
 ))
 
-inputFS.writeFileSync('/src/index.css', (
+inputFS.writeFileSync('/app/src/index.css', (
 `
 html {
   font-size: 20px;
@@ -53,18 +55,77 @@ html {
 const unionInputFS = new Union()
 unionInputFS.use(inputFS, FS)
 
+console.log(Path.resolve(__dirname, '..', 'node_modules'))
+
+const mergedInputFS = createMergedFileSystem({
+  // '/node_modules': Path.resolve(__dirname, '..', 'node_modules'),
+  // '/package.json': {
+  //   alias: '/app/package.json',
+  //   filesystem: inputFS
+  // },
+  // '/app/package.json': {
+  //   alias: '/app/package.json',
+  //   filesystem: inputFS
+  // },
+  // '/app/src/entry.js': {
+  //   alias: '/app/src/entry.js',
+  //   filesystem: inputFS
+  // },
+  '/app/src/entry.js/package.json': {
+    alias: '/app/package.json',
+    filesystem: inputFS
+  },
+  // '/app/src/entry.js/package.json': {
+  //   alias: '/app/package.json',
+  //   filesystem: inputFS
+  // },
+  // '/app': {
+  //   alias: '/app',
+  //   filesystem: inputFS
+  // },
+  // '/': Path.resolve(__dirname, '..'),
+  [Path.resolve(__dirname, '..', 'app')]: {
+    alias: '/app',
+    filesystem: inputFS
+  },
+  '/': '/'
+})
+
 const outputFS = new MemoryFS()
 outputFS.mkdirSync('/dist')
 
+// global.System = {
+//   import(path) {
+//     const path2 = path.replace(/^\/node_modules\//, '')
+//     console.log('System.import', path, path2)
+//     const resolvedPath = require.resolve(path2, {
+//       options: {
+//         path: Path.resolve(__dirname, '..')
+//       }
+//     })
+//     const a = require(resolvedPath)
+//     return Promise.resolve(a)
+//   }
+// }
+
+const webPath = (suffix) => (
+  Path.join(Path.resolve(__dirname, '..'), suffix)
+)
+
+console.log("webPath('/app/src/entry.js')", webPath('/app/src/entry.js'))
+
 const compiler = webpack({
   // context: '/',
-  entry: '/src/entry',
-  // resolve: {
-  //   modules: ['/', 'node_modules'],
-  //   extensions: ['.js', '.jsx']
-  // },
+  context: webPath('/'),
+  entry: webPath('/app/src/entry.js'),
+  resolve: {
+    modules: ['node_modules'],
+    // modules: [Path.resolve(__dirname, '..', 'node_modules')],
+    // extensions: ['.js', '.jsx']
+  },
   output: {
-    path: '/dist',
+    // path: webPath('/app/dist'),
+    path: '/app/dist',
     filename: 'bundle.js'
   },
   module: {
@@ -72,7 +133,9 @@ const compiler = webpack({
       {
         test: /\.jsx?$/,
         include: [
-          './src'
+          webPath('/app/src')
+          // './app/src',
+          // '/app/src'
         ],
         loader: 'babel-loader',
         options: {
@@ -81,6 +144,12 @@ const compiler = webpack({
       },
       {
         test: /\.css$/,
+        // include: [
+        //   // () => true,
+        //   // './src',
+        //   // Path.resolve(__dirname, 'src')
+        //   //'/'
+        // ],
         loader: 'css-loader',
         options: {
         }
@@ -89,11 +158,11 @@ const compiler = webpack({
   }
 })
 
-compiler.inputFileSystem = unionInputFS
 compiler.outputFileSystem = outputFS
-compiler.resolvers.normal.fileSystem = unionInputFS
-compiler.resolvers.context.fileSystem = unionInputFS
-// compiler.resolvers.loader.fileSystem = unionInputFS
+// compiler.inputFileSystem = mergedInputFS
+// compiler.resolvers.normal.fileSystem = mergedInputFS
+// compiler.resolvers.context.fileSystem = mergedInputFS
+// compiler.resolvers.loader.fileSystem = mergedInputFS
 
 function run() {
   return new Promise((resolve, reject) => {
@@ -103,7 +172,11 @@ function run() {
         reject(error)
       }
       else {
-        resolve({ stats, fs: outputFS })
+        resolve({
+          stats,
+          // bundleJS: FS.readFileSync
+          bundleJS: outputFS.readFileSync('/app/dist/bundle.js')
+        })
       }
     })
   })
