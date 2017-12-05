@@ -9,3 +9,6 @@ Content-Type: application/javascript
 ###
 
 GET http://localhost:8787/build/github
+
+###
+GET http://localhost:8787/build/github/RoyalIcing/Collected/app-react/src/components/Row.js?children=Children&summary

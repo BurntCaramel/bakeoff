@@ -65,8 +65,6 @@ html {
 const unionInputFS = new Union()
 unionInputFS.use(inputFS, FS)
 
-console.log(Path.resolve(__dirname, '..', 'node_modules'))
-
 const mergedInputFS = createMergedFileSystem({
   [Path.resolve(__dirname, '..', 'app')]: {
     alias: '/app',
@@ -95,8 +93,6 @@ outputFS.mkdirSync('/dist')
 const webPath = (suffix) => (
   Path.join(Path.resolve(__dirname, '..'), suffix)
 )
-
-console.log("webPath('/app/src/entry.js')", webPath('/app/src/entry.js'))
 
 const compiler = webpack({
   // context: '/',

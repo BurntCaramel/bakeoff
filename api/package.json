@@ -12,6 +12,7 @@
     "babel-preset-react": "^6.24.1",
     "css-loader": "^0.28.7",
     "hapi": "^17.1.1",
+    "lodash": "^4.17.4",
     "memory-fs": "^0.4.1",
     "merged-fs": "^0.2.1",
     "react": "^16.2.0",
