@@ -24,8 +24,17 @@ import './index.css';
 
 console.log('HELLO! TWO!')
 
+function Main({
+  Component,
+  cProps
+}) {
+  return (
+    <Component {...cProps} />
+  )
+}
+
 ReactDOM.render(
-  <App />,
+  <Main Component={ App } cProps={{}} />,
   document.getElementById('root')
 );
 `
@@ -144,12 +153,48 @@ compiler.inputFileSystem = mergedInputFS
 // compiler.resolvers.loader.fileSystem = mergedInputFS
 
 function run({
-  componentJS
+  componentJS,
+  props
 } = {}) {
   return new Promise((resolve, reject) => {
 
     if (componentJS) {
       inputFS.writeFileSync('/app/src/App.js', componentJS)
+    }
+
+    if (props) {
+      inputFS.writeFileSync('/app/src/entry.js', (
+        `
+        import React from 'react';
+        import ReactDOM from 'react-dom';
+        import App from './App';
+        import './index.css';
+        
+        console.log('HELLO! TWO!')
+        
+        class Main extends React.Component {
+          render() {
+            const {
+              Component,
+              cProps
+            } = this.props
+
+            return (
+              <Component {...cProps} />
+            )
+          }
+
+          componentDidCatch(error) {
+            console.error(error)
+          }
+        }
+        
+        ReactDOM.render(
+          <Main Component={ App } cProps={ ${JSON.stringify(props)} } />,
+          document.getElementById('root')
+        );
+        `
+        ))
     }
 
     compiler.run((error, stats) => {
